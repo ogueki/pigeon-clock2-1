@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鳩時計</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    
+    <!-- PWA マニフェスト -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- iOS対応のメタタグ -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="鳩時計">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- テーマカラー -->
+    <meta name="theme-color" content="#a44900">
+    
+    <!-- ファビコン -->
+    <link rel="icon" type="image/png" href="icon-192.png">
+</head>
+<body>
+    <div class="clock-body">
+        <div class="pigeon-window" id="pigeon">
+            <p class="pigeon-character" id="pigeon-character">🕊</p>
+        </div>
+        
+        <div class="clock">
+            <div class="time" id="digital-clock"></div>
+        </div>
+        
+        <button class='cry-button' onclick="playPigeonCry(),changePigeonColor()">はと</button>
+        
+        <!-- 設定パネル -->
+        <div class="settings-panel">
+            <div class="setting-item">
+                <span>時報通知</span>
+                <label class="switch">
+                    <input type="checkbox" id="hourly-notification-toggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="setting-item">
+                <span>タイマー設定</span>
+                <div class="timer-input">
+                    <input type="number" id="timer-hours" min="0" max="23" value="0" placeholder="時">
+                    <span>:</span>
+                    <input type="number" id="timer-minutes" min="0" max="59" value="1" placeholder="分">
+                    <button class="button" onclick="setTimer()">設定</button>
+                </div>
+            </div>
+            
+            <div class="timer-display" id="timer-display" style="display: none;">
+                タイマー: <span id="timer-countdown"></span>
+                <button class="button" onclick="cancelTimer()">キャンセル</button>
+            </div>
+            
+            <div class="notification-status" id="notification-status">
+                通知許可を確認中...
+            </div>
+        </div>
+        
+        <!-- PWA インストールボタン -->
+        <button id="install-button" class="install-button" style="display: none;">
+            📱 アプリをインストール
+        </button>
+    </div>
+
+    <audio id="pigeon-cry">
+        <source src="Cuckoo_Clock01-03(Denoise-Long).mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="pigeon-clock.js"></script>
+    <script>
+    // Service Worker の登録
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then((registration) => {
+                    console.log('Service Worker が登録されました:', registration);
+                })
+                .catch((error) => {
+                    console.log('Service Worker の登録に失敗しました:', error);
+                });
+        });
+    }
+
+    // PWA インストール機能
+    let deferredPrompt;
+    const installButton = document.getElementById('install-button');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installButton.style.display = 'block';
+    });
+
+    installButton.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`PWA インストール結果: ${outcome}`);
+            deferredPrompt = null;
+            installButton.style.display = 'none';
+        }
+    });
+
+    // 通知許可の自動リクエストを削除
+    // ユーザーがボタンをクリックした時のみ許可をリクエストする
+</script>
+</body>
+</html>

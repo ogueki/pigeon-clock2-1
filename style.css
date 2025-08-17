@@ -1,0 +1,301 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #333;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.clock-body {
+    width: 300px;
+    min-height: 500px;
+    background-color: #a44900;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    position: relative;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.pigeon-window {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 36px;
+    color: white;
+    background-color: black;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pigeon-character {
+    font-size: 36px;
+    color: white;
+    display: none;
+    margin: 0;
+    animation: none;
+}
+
+.pigeon-character-appear {
+    font-size: 36px;
+    color: white;
+    margin: 0;
+    display: block;
+    animation: pigeonAppear 0.5s ease-in-out;
+}
+
+@keyframes pigeonAppear {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.clock {
+    width: 200px;
+    height: 200px;
+    background-color: #fff;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+}
+
+.time {
+    font-size: 36px;
+    color: #333;
+    font-family: 'Courier New', monospace;
+}
+
+.cry-button, .button {
+    margin: 5px;
+    padding: 10px 20px;
+    background-color: #fff;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.cry-button:hover, .button:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.cry-button:active, .button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.install-button {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.install-button:hover {
+    background-color: #45a049;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* 新しく追加する設定パネルのスタイル */
+.settings-panel {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+/* スイッチのスタイル */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #4CAF50;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* タイマー入力のスタイル */
+.timer-input {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.timer-input input {
+    width: 40px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.timer-input .button {
+    padding: 5px 10px;
+    font-size: 12px;
+    margin: 0;
+}
+
+/* タイマー表示のスタイル */
+.timer-display {
+    font-size: 16px;
+    color: #333;
+    font-family: 'Courier New', monospace;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.timer-display .button {
+    padding: 5px 10px;
+    font-size: 12px;
+    margin: 0;
+}
+
+/* 通知ステータスのスタイル */
+.notification-status {
+    font-size: 12px;
+    color: #666;
+    margin: 5px 0;
+    text-align: center;
+}
+
+/* モバイル対応 */
+@media (max-width: 480px) {
+    .clock-body {
+        width: 280px;
+        min-height: 480px;
+        padding: 15px;
+    }
+    
+    .clock {
+        width: 180px;
+        height: 180px;
+    }
+    
+    .time {
+        font-size: 28px;
+    }
+    
+    .settings-panel {
+        padding: 10px;
+    }
+    
+    .setting-item {
+        font-size: 13px;
+    }
+    
+    .timer-input {
+        flex-wrap: wrap;
+        gap: 3px;
+    }
+    
+    .timer-input input {
+        width: 35px;
+    }
+}
+
+/* PWA用のスプラッシュスクリーン対応 */
+@media (display-mode: standalone) {
+    body {
+        background-color: #a44900;
+    }
+    
+    .clock-body {
+        border: 2px solid #333;
+    }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "鳩時計2 - Pigeon Clock",
+  "short_name": "鳩時計2",
+  "description": "毎時間鳩が鳴く可愛い時計アプリ",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#333333",
+  "theme_color": "#a44900",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["utilities", "lifestyle"],
+  "lang": "ja",
+  "dir": "ltr"
+}
