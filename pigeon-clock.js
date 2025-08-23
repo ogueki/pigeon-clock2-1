@@ -174,17 +174,19 @@ function updateNotificationStatus(permission) {
     }
 }
 
-// タイマー設定（バックグラウンド対応版）
+// タイマー設定（バックグラウンド対応版）- 秒数対応
 function setTimer() {
     const hoursInput = document.getElementById('timer-hours');
     const minutesInput = document.getElementById('timer-minutes');
+    const secondsInput = document.getElementById('timer-seconds');
     
-    if (!hoursInput || !minutesInput) return;
+    if (!hoursInput || !minutesInput || !secondsInput) return;
     
     const hours = parseInt(hoursInput.value) || 0;
     const minutes = parseInt(minutesInput.value) || 0;
+    const seconds = parseInt(secondsInput.value) || 0;
     
-    if (hours === 0 && minutes === 0) {
+    if (hours === 0 && minutes === 0 && seconds === 0) {
         alert('タイマー時間を設定してください');
         return;
     }
@@ -197,7 +199,8 @@ function setTimer() {
             if (event.data && event.data.success) {
                 // 現在時刻から指定時間後を計算（UI表示用）
                 const now = new Date();
-                timerEndTime = new Date(now.getTime() + (hours * 60 + minutes) * 60 * 1000);
+                const totalMs = (hours * 3600 + minutes * 60 + seconds) * 1000;
+                timerEndTime = new Date(now.getTime() + totalMs);
                 
                 // タイマー表示を表示
                 const timerDisplay = document.getElementById('timer-display');
@@ -205,30 +208,43 @@ function setTimer() {
                     timerDisplay.style.display = 'block';
                 }
                 
-                alert(`タイマーを${hours}時間${minutes}分後に設定しました\n（アプリを閉じても通知されます）`);
+                // 表示メッセージを改善
+                let timeStr = '';
+                if (hours > 0) timeStr += `${hours}時間`;
+                if (minutes > 0) timeStr += `${minutes}分`;
+                if (seconds > 0) timeStr += `${seconds}秒`;
+                
+                alert(`タイマーを${timeStr}後に設定しました\n（アプリを閉じても通知されます）`);
             }
         };
         
         navigator.serviceWorker.controller.postMessage({
             type: 'SET_TIMER',
             hours: hours,
-            minutes: minutes
+            minutes: minutes,
+            seconds: seconds
         }, [channel.port2]);
     } else {
         // Service Workerが利用できない場合は従来の処理
         const now = new Date();
-        timerEndTime = new Date(now.getTime() + (hours * 60 + minutes) * 60 * 1000);
+        const totalMs = (hours * 3600 + minutes * 60 + seconds) * 1000;
+        timerEndTime = new Date(now.getTime() + totalMs);
         
         const timerDisplay = document.getElementById('timer-display');
         if (timerDisplay) {
             timerDisplay.style.display = 'block';
         }
         
-        alert(`タイマーを${hours}時間${minutes}分後に設定しました`);
+        let timeStr = '';
+        if (hours > 0) timeStr += `${hours}時間`;
+        if (minutes > 0) timeStr += `${minutes}分`;
+        if (seconds > 0) timeStr += `${seconds}秒`;
+        
+        alert(`タイマーを${timeStr}後に設定しました`);
     }
 }
 
-// タイマーキャンセル
+// タイマーキャンセル - Service Worker対応完成版
 function cancelTimer() {
     timerEndTime = null;
     const timerDisplay = document.getElementById('timer-display');
@@ -241,7 +257,12 @@ function cancelTimer() {
         timerCountdown.textContent = '';
     }
     
-    // TODO: Service Worker側のタイマーもキャンセルする処理を追加
+    // Service Worker側のタイマーもキャンセル
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+            type: 'CANCEL_TIMER'
+        });
+    }
 }
 
 // タイマー表示更新

@@ -4,7 +4,8 @@ const urlsToCache = [
   './index.html',
   './style.css',
   './pigeon-clock.js',
-  './manifest.json'
+  './manifest.json',
+  './Cuckoo_Clock01-03(Denoise-Long).mp3'  // 音声ファイルも追加
 ];
 
 // Service Worker のインストール
@@ -72,16 +73,21 @@ self.addEventListener('fetch', (event) => {
 // タイマーを保存するための配列
 let activeTimers = [];
 
-// メッセージハンドラー
+// メッセージハンドラー - 秒数対応版
 self.addEventListener('message', (event) => {
   console.log('[SW] メッセージ受信:', event.data);
   
   if (event.data && event.data.type === 'SET_TIMER') {
     // タイマーを設定
-    const { hours, minutes } = event.data;
-    const timerMs = (hours * 60 + minutes) * 60 * 1000;
+    const { hours, minutes, seconds = 0 } = event.data;  // secondsのデフォルト値を0に
+    const timerMs = (hours * 3600 + minutes * 60 + seconds) * 1000;
     
-    console.log(`[SW] タイマー設定: ${hours}時間${minutes}分後`);
+    // ログメッセージを改善
+    let timeStr = '';
+    if (hours > 0) timeStr += `${hours}時間`;
+    if (minutes > 0) timeStr += `${minutes}分`;
+    if (seconds > 0) timeStr += `${seconds}秒`;
+    console.log(`[SW] タイマー設定: ${timeStr}後`);
     
     const timerId = setTimeout(() => {
       console.log('[SW] タイマー終了、通知を送信');
@@ -100,6 +106,13 @@ self.addEventListener('message', (event) => {
     if (event.ports && event.ports[0]) {
       event.ports[0].postMessage({ success: true });
     }
+  } else if (event.data && event.data.type === 'CANCEL_TIMER') {
+    // タイマーキャンセル処理
+    console.log('[SW] タイマーをキャンセル');
+    activeTimers.forEach(timer => {
+      clearTimeout(timer.id);
+    });
+    activeTimers = [];
   }
 });
 
@@ -115,16 +128,21 @@ function startHourlyCheck() {
     clearInterval(hourlyCheckInterval);
   }
   
-  // 30秒ごとにチェック（より正確に時刻を捉えるため）
-  hourlyCheckInterval = setInterval(() => {
-    checkAndSendHourlyNotification();
-  }, 30000); // 30秒ごと
+  // 次の0分まで待ってから開始（効率化）
+  const now = new Date();
+  const msUntilNextMinute = (60 - now.getSeconds()) * 1000;
   
-  // 初回チェック
-  checkAndSendHourlyNotification();
+  setTimeout(() => {
+    checkAndSendHourlyNotification();
+    
+    // その後は1分ごとにチェック（30秒より効率的）
+    hourlyCheckInterval = setInterval(() => {
+      checkAndSendHourlyNotification();
+    }, 60000); // 1分ごと
+  }, msUntilNextMinute);
 }
 
-// 時報通知の送信確認
+// 時報通知の送信確認 - 修正版
 async function checkAndSendHourlyNotification() {
   try {
     const now = new Date();
@@ -136,11 +154,8 @@ async function checkAndSendHourlyNotification() {
     if (minutes === 0 && seconds < 30 && lastHourNotified !== currentHour) {
       console.log(`[SW] 時報チェック: ${currentHour}時の通知を準備`);
       
-      // 通知許可を確認
-      const permission = await self.registration.pushManager.permissionState({ userVisibleOnly: true });
-      console.log('[SW] 通知許可状態:', permission);
-      
-      if (permission !== 'granted') {
+      // 通知許可の確認（修正版）
+      if (!('Notification' in self) || Notification.permission !== 'granted') {
         console.log('[SW] 通知が許可されていません');
         return;
       }
